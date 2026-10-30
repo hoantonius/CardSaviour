@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CardSaviour</string>
+    <string name="privacy_note">This app reads text from the photo and creates a contact file the phone can save.</string>
+</resources>
