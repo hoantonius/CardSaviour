@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import id.cardframe.app.data.contacts.ContactIntents
 import id.cardframe.app.domain.model.ContactDraft
 import id.cardframe.app.domain.vcard.VCardWriter
+import id.cardframe.app.session.ReviewGate
 import id.cardframe.app.session.ScanSession
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -13,6 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ReviewViewModel @Inject constructor(
     private val session: ScanSession,
+    val gate: ReviewGate,
 ) : ViewModel() {
     val draft: StateFlow<ContactDraft?> = session.draft
     val preview = session.preview
@@ -28,5 +30,7 @@ class ReviewViewModel @Inject constructor(
 
     fun insertIntent(): Intent? = session.draft.value?.let(ContactIntents::insert)
 
-    fun clear() = session.clear()
+    fun commit(draft: ContactDraft) = session.update(draft)
+
+    fun discardCard() = session.stashUndo()
 }

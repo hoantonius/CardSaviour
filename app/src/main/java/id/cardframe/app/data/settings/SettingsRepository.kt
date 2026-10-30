@@ -19,6 +19,7 @@ data class AppSettings(
     val theme: AuroraThemeId = AuroraThemeId.Ink,
     val night: NightMode = NightMode.System,
     val autoCapture: Boolean = true,
+    val seenRelease: String = "",
 )
 
 private val Context.settingsStore by preferencesDataStore(name = "cardframe_settings")
@@ -43,10 +44,15 @@ class SettingsRepository @Inject constructor(
         context.settingsStore.edit { it[Keys.AUTO] = enabled }
     }
 
+    suspend fun setSeenRelease(version: String) {
+        context.settingsStore.edit { it[Keys.SEEN] = version }
+    }
+
     private fun Preferences.toSettings(): AppSettings = AppSettings(
         theme = this[Keys.THEME].toEnum(AuroraThemeId.Ink),
         night = this[Keys.NIGHT].toEnum(NightMode.System),
         autoCapture = this[Keys.AUTO] ?: true,
+        seenRelease = this[Keys.SEEN].orEmpty(),
     )
 
     private inline fun <reified T : Enum<T>> String?.toEnum(fallback: T): T =
@@ -56,5 +62,6 @@ class SettingsRepository @Inject constructor(
         val THEME = stringPreferencesKey("theme")
         val NIGHT = stringPreferencesKey("night")
         val AUTO = booleanPreferencesKey("auto_capture")
+        val SEEN = stringPreferencesKey("seen_release")
     }
 }

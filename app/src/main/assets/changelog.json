@@ -1,0 +1,24 @@
+{
+  "releases": [
+    {
+      "version": "1.1.0",
+      "date": "2026-10-30",
+      "items": [
+        {"kind": "New", "text": "Look at the card first, then edit only the fields you want to change."},
+        {"kind": "New", "text": "A What's new card on the scan screen, and the full version history in Settings."},
+        {"kind": "Improved", "text": "Typing no longer rebuilds the contact file or the QR code."},
+        {"kind": "Improved", "text": "The QR code stays black on white in every theme."},
+        {"kind": "Improved", "text": "Settings are grouped, searchable, and use preset sheets."},
+        {"kind": "Fixed", "text": "Leaving an edit asks before your changes are dropped, and discarding a card can be undone."}
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2026-10-29",
+      "items": [
+        {"kind": "New", "text": "Scan a business card and open the phone Add Contact screen."},
+        {"kind": "New", "text": "Download a vCard or show a QR code of the same contact."}
+      ]
+    }
+  ]
+}

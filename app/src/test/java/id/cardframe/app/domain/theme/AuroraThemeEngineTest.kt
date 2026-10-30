@@ -23,6 +23,14 @@ class AuroraThemeEngineTest {
                     "$id dark=$dark muted/surface",
                     AuroraThemeEngine.contrastRatio(palette.muted, palette.surface) >= 4.5,
                 )
+                assertTrue(
+                    "$id dark=$dark success/background",
+                    AuroraThemeEngine.contrastRatio(palette.success, palette.background) >= 4.5,
+                )
+                assertTrue(
+                    "$id dark=$dark danger/background",
+                    AuroraThemeEngine.contrastRatio(palette.danger, palette.background) >= 4.5,
+                )
             }
         }
     }

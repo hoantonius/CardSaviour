@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -38,7 +39,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.cardframe.app.R
 import id.cardframe.app.domain.vcard.VCardWriter
 import id.cardframe.app.ui.review.ReviewViewModel
-import id.cardframe.app.ui.theme.auroraPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,12 +48,9 @@ fun QrScreen(
 ) {
     val draft by viewModel.draft.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val palette = auroraPalette()
     val card = draft
     val payload = card?.let(VCardWriter::build).orEmpty()
-    val qr = remember(payload, palette.ink, palette.surface) {
-        if (payload.isBlank()) null else QrEncoder.encode(payload, 840, palette.ink.toInt(), palette.surface.toInt())
-    }
+    val qr = remember(payload) { QrEncoder.encodeCached(payload) }
     val saveVcf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/x-vcard")) { uri ->
         if (uri == null || payload.isBlank()) return@rememberLauncherForActivityResult
         context.contentResolver.openOutputStream(uri)?.use { it.write(payload.toByteArray(Charsets.UTF_8)) }
@@ -61,6 +58,7 @@ fun QrScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
                 title = { Text("Contact QR") },
@@ -94,7 +92,7 @@ fun QrScreen(
                     modifier = Modifier
                         .size(280.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(palette.surface))
+                        .background(Color.White)
                         .padding(12.dp),
                 )
                 Text(

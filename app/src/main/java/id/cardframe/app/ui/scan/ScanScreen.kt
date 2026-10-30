@@ -10,15 +10,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,6 +60,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import id.cardframe.app.R
 import id.cardframe.app.domain.model.CaptureProblem
+import id.cardframe.app.domain.release.ReleaseNote
 import id.cardframe.app.ui.theme.auroraPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,8 +68,9 @@ import id.cardframe.app.ui.theme.auroraPalette
 fun ScanScreen(
     autoCapture: Boolean,
     onAutoCapture: (Boolean) -> Unit,
-    onOpenSettings: () -> Unit,
     onOpenReview: () -> Unit,
+    whatsNew: ReleaseNote? = null,
+    onDismissWhatsNew: () -> Unit = {},
     viewModel: ScanViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -102,14 +107,10 @@ fun ScanScreen(
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    IconButton(onClick = onOpenSettings, modifier = Modifier.size(48.dp)) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     titleContentColor = MaterialTheme.colorScheme.onBackground,
@@ -121,12 +122,13 @@ fun ScanScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp),
         ) {
             androidx.compose.foundation.layout.Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .height(300.dp)
                     .padding(bottom = 16.dp)
                     .background(Color(palette.surfaceHigh), MaterialTheme.shapes.large)
                     .semantics { contentDescription = "Camera preview. Place the card inside the frame." },
@@ -170,6 +172,10 @@ fun ScanScreen(
                 color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(Modifier.height(16.dp))
+            whatsNew?.let { note ->
+                WhatsNewCard(note, onDismissWhatsNew)
+                Spacer(Modifier.height(12.dp))
+            }
             Button(
                 onClick = shutter,
                 enabled = cameraOn && !reading,
@@ -249,6 +255,41 @@ fun ScanScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun WhatsNewCard(note: ReleaseNote, onDismiss: () -> Unit) {
+    val palette = auroraPalette()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(palette.surface), MaterialTheme.shapes.large)
+            .padding(16.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "What's new in ${note.version}",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(onClick = onDismiss, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.Filled.Close, contentDescription = "Dismiss what's new")
+            }
+        }
+        note.items.take(3).forEach { item ->
+            val color = when (item.kind) {
+                "New" -> Color(palette.success)
+                "Fixed" -> Color(palette.caution)
+                else -> MaterialTheme.colorScheme.primary
+            }
+            Text(
+                "${item.kind} · ${item.text}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = color,
+                modifier = Modifier.padding(top = 6.dp),
             )
         }
     }

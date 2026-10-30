@@ -5,7 +5,22 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 
+import id.cardframe.app.domain.qr.QrColors
+
 object QrEncoder {
+    private var cachedKey: String? = null
+    private var cached: Bitmap? = null
+
+    fun encodeCached(text: String, size: Int = 840): Bitmap? {
+        if (text.isBlank()) return null
+        val key = "$size\u0000$text"
+        if (key == cachedKey) return cached
+        val bitmap = encode(text, size, QrColors.DARK.toInt(), QrColors.LIGHT.toInt())
+        cachedKey = key
+        cached = bitmap
+        return bitmap
+    }
+
     fun encode(text: String, size: Int, dark: Int, light: Int): Bitmap? {
         if (text.isBlank()) return null
         val matrix = QRCodeWriter().encode(

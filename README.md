@@ -17,7 +17,7 @@ This app reads text from the photo and creates a contact file the phone can save
 
 ## Not in this app
 
-- No database of cards. After you leave the review screen, the photo is dropped.
+- No database of cards. The photo stays in memory until you discard the card or leave the app. Nothing is written to disk, and nothing is uploaded.
 - No Google Drive backup and no background sync. The phone book already syncs with the account on the device.
 - No accessibility service.
 
